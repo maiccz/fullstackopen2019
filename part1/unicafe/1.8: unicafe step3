@@ -1,21 +1,32 @@
 import React, { useState } from 'react'
 import ReactDOM from 'react-dom'
 
-const Button = (props) => (
-  <button onClick={props.handleClick}>
-    {props.text}
+const Button = ({handleClick, text}) => (
+  <button onClick={handleClick}>
+    {text}
   </button>
 )
 
-const Header = (props) => {
+const Header = ({name}) => {
   return (
-      <h1>{props.name}</h1>
+      <h1>{name}</h1>
   )
 }
 
-const Statistics = (props) => {
+const Statistics = ({good, neutral, bad}) => {
+  let all = good + neutral + bad
+  let average = ((good - bad) / all).toFixed(2)
+  let positive = ((good / all * 100)).toFixed(2) + " %" 
+
   return (
-      <p>{props.name} {props.value}</p>
+    <div>
+    <p>good {good}</p>
+    <p>neutral {neutral}</p>
+    <p>bad {bad}</p>
+    <p>all {all}</p>
+    <p>average {average}</p>
+    <p>positive {positive}</p>
+    </div>
   )
 }
   
@@ -45,12 +56,7 @@ const App = () => {
       <Button handleClick={handleNeutralClick} text={'neutral'} />
       <Button handleClick={handleBadClick} text={'bad'} />
       <Header name={'statistics'} />
-      <Statistics name={'good'} value={good} />
-      <Statistics name={'neutral'} value={neutral} />
-      <Statistics name={'bad'} value={bad} />
-      <Statistics name={'all'} value={good + neutral + bad} />
-      <Statistics name={'average'} value={((good * 1 + neutral * 0 + bad * -1) / (good + neutral + bad)).toFixed(2)} />
-      <Statistics name={'positive'} value={(good / (good + neutral + bad) * 100).toFixed(2) + '%'} />
+      <Statistics good={good} neutral={neutral} bad={bad} />
     </div>
   )
 }
