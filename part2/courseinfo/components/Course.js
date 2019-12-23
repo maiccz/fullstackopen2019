@@ -14,11 +14,9 @@ const Part = (props) => {
   )
 }
 
-const Total = (props) => {
-  let numberOfExercises = 0;
-  props.course.parts.map(part => numberOfExercises += part.exercises);
+const Total = ({ course }) => {
   return (
-      <b>total of {numberOfExercises} exercises</b>
+      <b>total of {course.parts.reduce((s, p) => s + p.exercises, 0)} exercises</b>
   )
 }
 
