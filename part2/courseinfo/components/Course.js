@@ -1,5 +1,5 @@
 import React from 'react'
-C
+
 const Header = ({ course }) => {
   return (
       <h1>{course.name}</h1>
