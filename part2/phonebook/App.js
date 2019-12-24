@@ -1,5 +1,43 @@
 import React, { useState } from 'react'
 
+const Filter = ({ value, onChange }) => {
+  return(
+    <div>
+      filter shown with: <input 
+        value={value}
+        onChange={onChange}/>
+    </div>
+  )
+}
+
+const PersonForm = ({ names, values, onChanges, onSubmit }) => {
+  return(
+    <form onSubmit={onSubmit}>
+    {names.map((name, i) => 
+      <div key={name}>
+        {name}: <input 
+        value={values[i]}
+        onChange={onChanges[i]}
+        />
+    </div>
+    )}
+    <div>
+      <button type="submit">add</button>
+    </div>
+  </form>
+  )
+} 
+
+const Persons = ({ persons }) => {
+  return(
+    <>
+      {persons.map(person =>
+        <li key={person.id}>{person.name} {person.number}</li>
+      )}
+    </>
+  )
+}
+
 const App = () => {
   const [ persons, setPersons] = useState([
     { name: 'Arto Hellas', number: '040-1234567', id: 1 },
@@ -43,40 +81,21 @@ const App = () => {
   ? persons.filter(person => person.name.toLowerCase().includes(newFilter.toLowerCase()))
   : persons
 
-  const rows = () => personsToShow.map(person =>
-    <li key={person.id}>{person.name} {person.number}</li>
-  )
-
   return (
     <div>
       <h2>Phonebook</h2>
-      <div>
-        filter shown with: <input 
-          value={newFilter}
-          onChange={handleFilterChange}/>
-      </div>
+      <Filter value={newFilter} onChange={handleFilterChange} />
       <h2>add new</h2>
-      <form onSubmit={addPerson}>
-        <div>
-          name: <input 
-            value={newName}
-            onChange={handleNameChange}/>
-        </div>
-        <div>
-          number: <input 
-            value={newNumber}
-            onChange={handleNumberChange}/>
-      </div>
-        <div>
-          <button type="submit">add</button>
-        </div>
-      </form>
+      <PersonForm 
+        onSubmit={addPerson}
+        names={['name', 'number']}
+        values={[newName, newNumber]}
+        onChanges={[handleNameChange, handleNumberChange]}
+      />
       <h2>Numbers</h2>
-        <ul>
-          {rows()}
-        </ul>
+        <Persons persons={personsToShow} />
     </div>
   )
-}
+} 
 
 export default App
