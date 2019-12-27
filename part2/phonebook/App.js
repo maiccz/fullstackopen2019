@@ -1,43 +1,9 @@
 import React, { useState, useEffect } from 'react'
-import axios from 'axios'
+import personService from './services/persons' 
 
-const Filter = ({ value, onChange }) => {
-  return(
-    <div>
-      filter shown with: <input 
-        value={value}
-        onChange={onChange}/>
-    </div>
-  )
-}
-
-const PersonForm = ({ names, values, onChanges, onSubmit }) => {
-  return(
-    <form onSubmit={onSubmit}>
-    {names.map((name, i) => 
-      <div key={name}>
-        {name}: <input 
-        value={values[i]}
-        onChange={onChanges[i]}
-        />
-    </div>
-    )}
-    <div>
-      <button type="submit">add</button>
-    </div>
-  </form>
-  )
-} 
-
-const Persons = ({ persons }) => {
-  return(
-    <>
-      {persons.map(person =>
-        <li key={person.id}>{person.name} {person.number}</li>
-      )}
-    </>
-  )
-}
+import Filter from './components/filter'
+import PersonForm from './components/person_form'
+import Persons from './components/persons'
 
 const App = () => {
   const [ persons, setPersons] = useState([]) 
@@ -46,15 +12,10 @@ const App = () => {
   const [ newFilter, setNewFilter ] = useState('')
 
   useEffect(() => {
-    console.log('effect')
-    axios
-      .get('http://localhost:3001/persons')
-      .then(response => {
-        console.log('promise fulfilled')
-        setPersons(response.data)
-      })
+    personService
+      .getAll()
+      .then(initialPersons => setPersons(initialPersons))
   }, [])
-  console.log('render', persons.length, 'notes')
 
   const addPerson = (event) => {
     event.preventDefault()
@@ -66,10 +27,25 @@ const App = () => {
         number: newNumber,
         id: persons.length + 1,
       }
-      setPersons(persons.concat(personObject))
-      setNewName('')
-      setNewNumber('')
+
+      personService
+      .create(personObject)
+      .then(data => {
+        setPersons(persons.concat(data))
+        setNewName('')
+        setNewNumber('')
+      })
     }
+  }
+
+  const deletePerson = id => {
+
+    personService
+    .deleteOne(id)
+    .then(data => {
+      setPersons(persons.filter(person => person.id !== id))
+
+    })
   }
 
   const handleNameChange = (event) => {
@@ -100,7 +76,7 @@ const App = () => {
         onChanges={[handleNameChange, handleNumberChange]}
       />
       <h2>Numbers</h2>
-        <Persons persons={personsToShow} />
+        <Persons persons={personsToShow} deletePerson={deletePerson}/>
     </div>
   )
 } 
