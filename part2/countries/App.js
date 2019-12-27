@@ -10,7 +10,10 @@ const Filter = ({ value, onChange }) => {
     </div>
   )
 }
+
 const Countries = ({ countries }) => {
+  const [showDetails, setShowDetails] = useState()
+  
   if (countries.length===0) {
     return(
       <>
@@ -19,8 +22,37 @@ const Countries = ({ countries }) => {
     )
   } else if (countries.length===1) {
     return(
+      <Details 
+        countries={countries} 
+        id={countries.map(country => country.alpha3Code).join()} 
+      />
+    )
+  } else if (countries.length<10) { 
+    return(
       <>
         {countries.map(country =>
+          <li key={country.alpha3Code}>
+          {country.name}
+          <button onClick={() => setShowDetails(country.alpha3Code)}>show</button>
+          </li>
+        )}
+        {showDetails ? <Details countries={countries} id={showDetails}/> : '' }
+      </>
+    )
+  }
+  return(
+    <>
+      Too many matches, specify another filter
+    </>
+  )
+}
+
+const Details = ({ countries, id }) => {
+  return(
+    <>
+      {countries
+        .filter(country => country.alpha3Code === id)
+        .map(country =>
           <div key={country.alpha3Code}>
             <h2>{country.name}</h2>
             capital {country.capital}
@@ -33,22 +65,10 @@ const Countries = ({ countries }) => {
               )}
             </ul>
             <img src={country.flag} alt="country.flag" height="100" width="100"></img>
+            <br></br>
           </div>
-        )}
-      </>
-    )
-  } else if (countries.length<10) {
-    return(
-      <>
-        {countries.map(country =>
-          <li key={country.alpha3Code}>{country.name}</li>
-        )}
-      </>
-    )
-  }
-  return(
-    <>
-      Too many matches, specify another filter
+        )
+      }
     </>
   )
 }
@@ -58,12 +78,15 @@ const App = () => {
   const [ newFilter, setNewFilter ] = useState('')
 
   useEffect(() => {
+    console.log('effect')
     axios
       .get('https://restcountries.eu/rest/v2/all')
       .then(response => {
+        console.log('promise fulfilled')
         setCountries(response.data)
       })
   }, [])
+  console.log('render', countries.length, 'countries')
 
   const handleFilterChange = (event) => {
     setNewFilter(event.target.value)
