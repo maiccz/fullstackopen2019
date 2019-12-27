@@ -48,6 +48,7 @@ const Countries = ({ countries }) => {
 }
 
 const Details = ({ countries, id }) => {
+
   return(
     <>
       {countries
@@ -66,6 +67,7 @@ const Details = ({ countries, id }) => {
             </ul>
             <img src={country.flag} alt="country.flag" height="100" width="100"></img>
             <br></br>
+            <Weather capital={country.capital} />
           </div>
         )
       }
@@ -73,20 +75,43 @@ const Details = ({ countries, id }) => {
   )
 }
 
+const Weather = (capital) => {
+  const [showWeather, setShowWeather] = useState()
+  const key = 'f4e19bcf48aa11661693cdb94bbfbc2c'
+  useEffect(() => {
+    axios
+      .get(`http://api.weatherstack.com/current?access_key=${key}&query=${capital.capital}`)
+      .then(response => {
+        setShowWeather(response.data)
+      })
+  }, [])
+
+  if (typeof(showWeather) === 'object') {
+    return(
+      <div>
+        <h3>Weather in {showWeather.location.name}</h3>
+        <b>temperature: </b> {showWeather.current.temperature} Celsius
+        <br></br>
+        {showWeather.current.weather_icons
+          .map(icon => <img src={icon} alt="country.flag" height="50" width="50"></img>)}
+        <br></br>
+        <b>wind: </b> {showWeather.current.wind_speed} kph direction {showWeather.current.wind_dir}
+      </div>
+  )} else {
+  return('...')}
+}
+
 const App = () => {
-  const [ countries, setCountries] = useState([]) 
+  const [ countries, setCountries ] = useState([]) 
   const [ newFilter, setNewFilter ] = useState('')
 
   useEffect(() => {
-    console.log('effect')
     axios
       .get('https://restcountries.eu/rest/v2/all')
       .then(response => {
-        console.log('promise fulfilled')
         setCountries(response.data)
       })
   }, [])
-  console.log('render', countries.length, 'countries')
 
   const handleFilterChange = (event) => {
     setNewFilter(event.target.value)
