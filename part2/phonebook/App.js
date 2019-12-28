@@ -44,7 +44,7 @@ const App = () => {
     .then(data => {
       setPersons(persons.concat(data))
       setNewMessage(
-        `Added '${data.name}'`
+        {content: `Added '${data.name}'`, type: 'success'}
       )
       setTimeout(() => {
         setNewMessage(null)
@@ -63,16 +63,20 @@ const App = () => {
       .then(returnedPerson => {
         setPersons(persons.map(person => person.name !== name ? person : returnedPerson))
         setNewMessage(
-          `${returnedPerson.name} number updated` 
+          {content: `${returnedPerson.name} number updated`, type: 'success'}
         )
         setTimeout(() => {
           setNewMessage(null)
         }, 5000)
       })
       .catch(error => {
-        alert(
-          `the person '${person.content}' was already deleted from server`
+        console.log(error)
+        setNewMessage(
+          {content: `the person '${person.name}' was already deleted from server`, type: 'error'}
         )
+        setTimeout(() => {
+          setNewMessage(null)
+        }, 5000)
         setPersons(persons.filter(n => n.name !== name))
       })
     setNewName('')
@@ -85,8 +89,18 @@ const App = () => {
     .deleteOne(id)
     .then(data => {
       setPersons(persons.filter(person => person.id !== id))
-
     })
+    .catch(error => {
+      setNewMessage(
+        {content: `the person '${persons.find(person => person.id === id).name}' was already deleted from server`, type: 'error'}
+      )
+      setTimeout(() => {
+        setNewMessage(null)
+      }, 5000)
+      setPersons(persons.filter(n => n.id !== id))
+    })
+  setNewName('')
+  setNewNumber('')
   }
 
   const handleNameChange = (event) => {
@@ -108,7 +122,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <Notification message={newMessage} />
+      <Notification message={newMessage}/>
       <Filter value={newFilter} onChange={handleFilterChange} />
       <h2>add new</h2>
       <PersonForm 
