@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react'
+
 import Blog from './components/Blog'
 import Notification from './components/Notification'
+import Togglable from './components/Togglable'
+
 import blogService from './services/blogs' 
 import loginService from './services/login'
 
@@ -73,6 +76,8 @@ const App = () => {
 
   const addBlog = (event) => {
     event.preventDefault()
+    blogFormRef.current.toggleVisibility()
+
     const blogObject = {
       title: newTitle,
       author: newAuthor,
@@ -87,14 +92,13 @@ const App = () => {
         setNewAuthor('')
         setNewUrl('')
         setNewMessage(
-          {content: `a new bloh ''${data.title}'' added`, type: 'success'}
+          {content: `a new blog ''${data.title}'' added`, type: 'success'}
         )
         setTimeout(() => {
           setNewMessage(null)
         }, 5000)
       })
       .catch(error => {
-        console.log(error.response.data)
         setNewMessage(
           {content: `${error.response.data.error}`, type: 'error'}
         )
@@ -104,10 +108,67 @@ const App = () => {
       })
   }
 
-  const blogsRows = () => blogs.map(blog =>
+  const incrementLikesOf = id => {
+    const blog = blogs.find(b => b.id === id)
+    const incrementedLike = blog.likes + 1
+    const changedBlog = { ...blog, likes: incrementedLike }
+
+    blogService
+      .update(id, changedBlog)
+      .then(returnedBlog => {
+        setBlogs(blogs.map(blog => blog.id !== id ? blog : returnedBlog.data))
+      })
+      .catch(error => {
+        if (error)
+        setNewMessage(
+          {content: `Blog '${blog.title}' was already removed from server`, type: 'error'}
+        )
+        setTimeout(() => {
+          setNewMessage(null)
+        }, 5000)
+        setBlogs(blogs.filter(b => b.id !== id))
+      })
+  }
+
+  const removeBlog = id => {
+    const blogTitle = blogs.find(blog => blog.id === id).title
+
+    const deleteBlog = window.confirm(`remove blog '${blogTitle}'`) 
+        ? true
+        : false
+
+    if (deleteBlog) {
+      blogService
+      .deleteOne(id)
+      .then(data => {
+        setBlogs(blogs.filter(blog => blog.id !== id))
+        setNewMessage(
+            {content: `Deleted ${blogTitle}`, type: 'success'}
+          )
+          setTimeout(() => {
+            setNewMessage(null)
+          }, 5000)
+        })
+      .catch(error => {
+        if (error.toString().includes('Request failed with status code 401')) {
+          setNewMessage(
+            {content: 'you can only remove your own blogs', type: 'error'})
+        } else {
+          setNewMessage({content: error, type: 'error'})
+        }
+        setTimeout(() => {
+          setNewMessage(null)
+        }, 5000)
+      })
+    }
+  }
+
+  const blogsRows = () => blogs.sort((a, b) => b.likes - a.likes).map(blog =>
     <Blog
       key={blog.id}
       blog={blog}
+      incrementLikesOf={incrementLikesOf}
+      removeBlog={removeBlog}
     />
   )
 
@@ -159,6 +220,8 @@ const App = () => {
     </form>  
   )
 
+  const blogFormRef = React.createRef()
+
   return (
     <div>
       <Notification message={errorMessage} />
@@ -170,8 +233,10 @@ const App = () => {
           {user.name} logged in
           <button onClick={handleLogOut}>logout</button>
         </p>
+        <Togglable buttonLabel="new blog" ref={blogFormRef}>
         <h2>create new</h2>
         {blogForm()}
+        </Togglable>
         {blogsRows()}
         </div>
       }
