@@ -40,7 +40,7 @@ describe('<App />', () => {
       token: '1231231214',
       name: 'Donald Tester'
     }
-    
+
     localStorage.setItem('loggedBlogappUser', JSON.stringify(user))
 
     const component = render(
