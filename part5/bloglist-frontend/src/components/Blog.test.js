@@ -8,7 +8,7 @@ const blog = {
   author: 'Robert C. Martin',
   likes: 2,
   url: 'http://blog.cleancoder.com/uncle-bob/2016/05/01/TypeWars.html',
-  user: {username: 'Test'}
+  user: { username: 'Test' }
 }
 
 localStorage.setItem('loggedBlogappUser', JSON.stringify(blog.user))
@@ -24,7 +24,7 @@ beforeEach(() => {
 test('renders component with correct content', () => {
   expect(component.container).toHaveTextContent(
     `${blog.title}`
-)
+  )
 
   expect(component.container).toHaveTextContent(
     `${blog.author}`

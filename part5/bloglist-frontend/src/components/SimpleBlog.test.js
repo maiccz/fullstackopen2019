@@ -41,4 +41,4 @@ test('clicking the button calls event handler twice', () => {
   fireEvent.click(button)
 
   expect(mockHandler.mock.calls.length).toBe(2)
-  })
+})

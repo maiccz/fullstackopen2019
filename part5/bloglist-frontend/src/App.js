@@ -4,16 +4,16 @@ import Blog from './components/Blog'
 import Notification from './components/Notification'
 import Togglable from './components/Togglable'
 
-import blogService from './services/blogs' 
+import blogService from './services/blogs'
 import loginService from './services/login'
 
 const App = () => {
-  const [blogs, setBlogs] = useState([]) 
+  const [blogs, setBlogs] = useState([])
   const [newTitle, setNewTitle] = useState('')
   const [newAuthor, setNewAuthor] = useState('')
   const [newUrl, setNewUrl] = useState('')
   const [errorMessage, setNewMessage] = useState(null)
-  const [username, setUsername] = useState('') 
+  const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
 
@@ -43,20 +43,20 @@ const App = () => {
 
       window.localStorage.setItem(
         'loggedBlogappUser', JSON.stringify(user)
-      ) 
+      )
 
       blogService.setToken(user.token)
       setUser(user)
       setUsername('')
       setPassword('')
       setNewMessage(
-        {content: `You have successfully logged in`, type: 'success'}
+        { content: 'You have successfully logged in', type: 'success' }
       )
       setTimeout(() => {
         setNewMessage(null)
       }, 5000)
     } catch (exception) {
-      setNewMessage({content: 'Wrong credentials', type: 'error'})
+      setNewMessage({ content: 'Wrong credentials', type: 'error' })
       setTimeout(() => {
         setNewMessage(null)
       }, 5000)
@@ -67,7 +67,7 @@ const App = () => {
     window.localStorage.removeItem('loggedBlogappUser')
     setUser(null)
     setNewMessage(
-      {content: `You have successfully logged out`, type: 'success'}
+      { content: 'You have successfully logged out', type: 'success' }
     )
     setTimeout(() => {
       setNewMessage(null)
@@ -92,7 +92,7 @@ const App = () => {
         setNewAuthor('')
         setNewUrl('')
         setNewMessage(
-          {content: `a new blog ''${data.title}'' added`, type: 'success'}
+          { content: `a new blog ''${data.title}'' added`, type: 'success' }
         )
         setTimeout(() => {
           setNewMessage(null)
@@ -100,7 +100,7 @@ const App = () => {
       })
       .catch(error => {
         setNewMessage(
-          {content: `${error.response.data.error}`, type: 'error'}
+          { content: `${error.response.data.error}`, type: 'error' }
         )
         setTimeout(() => {
           setNewMessage(null)
@@ -120,9 +120,9 @@ const App = () => {
       })
       .catch(error => {
         if (error)
-        setNewMessage(
-          {content: `Blog '${blog.title}' was already removed from server`, type: 'error'}
-        )
+          setNewMessage(
+            { content: `Blog '${blog.title}' was already removed from server`, type: 'error' }
+          )
         setTimeout(() => {
           setNewMessage(null)
         }, 5000)
@@ -133,33 +133,33 @@ const App = () => {
   const removeBlog = id => {
     const blogTitle = blogs.find(blog => blog.id === id).title
 
-    const deleteBlog = window.confirm(`remove blog '${blogTitle}'`) 
-        ? true
-        : false
+    const deleteBlog = window.confirm(`remove blog '${blogTitle}'`)
+      ? true
+      : false
 
     if (deleteBlog) {
       blogService
-      .deleteOne(id)
-      .then(data => {
-        setBlogs(blogs.filter(blog => blog.id !== id))
-        setNewMessage(
-            {content: `Deleted ${blogTitle}`, type: 'success'}
+        .deleteOne(id)
+        .then(() => {
+          setBlogs(blogs.filter(blog => blog.id !== id))
+          setNewMessage(
+            { content: `Deleted ${blogTitle}`, type: 'success' }
           )
           setTimeout(() => {
             setNewMessage(null)
           }, 5000)
         })
-      .catch(error => {
-        if (error.toString().includes('Request failed with status code 401')) {
-          setNewMessage(
-            {content: 'you can only remove your own blogs', type: 'error'})
-        } else {
-          setNewMessage({content: error, type: 'error'})
-        }
-        setTimeout(() => {
-          setNewMessage(null)
-        }, 5000)
-      })
+        .catch(error => {
+          if (error.toString().includes('Request failed with status code 401')) {
+            setNewMessage(
+              { content: 'you can only remove your own blogs', type: 'error' })
+          } else {
+            setNewMessage({ content: error, type: 'error' })
+          }
+          setTimeout(() => {
+            setNewMessage(null)
+          }, 5000)
+        })
     }
   }
 
@@ -173,10 +173,10 @@ const App = () => {
   )
 
   const loginForm = () => (
-    <form onSubmit={handleLogin}>
+    <form onSubmit={handleLogin} className='loginForm'>
       <div>
         username
-          <input
+        <input
           type="text"
           value={username}
           name="Username"
@@ -185,7 +185,7 @@ const App = () => {
       </div>
       <div>
         password
-          <input
+        <input
           type="password"
           value={password}
           name="Password"
@@ -193,31 +193,31 @@ const App = () => {
         />
       </div>
       <button type="submit">login</button>
-    </form>      
+    </form>
   )
 
   const blogForm = () => (
     <form onSubmit={addBlog}>
       <div>
       title
-      <input
-        value={newTitle}
-        onChange={({ target }) => setNewTitle(target.value)}/>
+        <input
+          value={newTitle}
+          onChange={({ target }) => setNewTitle(target.value)}/>
       </div>
       <div>
       author
-      <input
-        value={newAuthor}
-        onChange={({ target }) => setNewAuthor(target.value)}/>
+        <input
+          value={newAuthor}
+          onChange={({ target }) => setNewAuthor(target.value)}/>
       </div>
       <div>
       url
-      <input
-        value={newUrl}
-        onChange={({ target }) => setNewUrl(target.value)}/>
+        <input
+          value={newUrl}
+          onChange={({ target }) => setNewUrl(target.value)}/>
       </div>
       <button type="submit">create</button>
-    </form>  
+    </form>
   )
 
   const blogFormRef = React.createRef()
@@ -228,20 +228,20 @@ const App = () => {
       {user === null ?
         loginForm() :
         <div>
-        <h1>blogs</h1>
-        <p>
-          {user.name} logged in
-          <button onClick={handleLogOut}>logout</button>
-        </p>
-        <Togglable buttonLabel="new blog" ref={blogFormRef}>
-        <h2>create new</h2>
-        {blogForm()}
-        </Togglable>
-        {blogsRows()}
+          <h1>blogs</h1>
+          <p>
+            {user.name} logged in
+            <button onClick={handleLogOut}>logout</button>
+          </p>
+          <Togglable buttonLabel="new blog" ref={blogFormRef}>
+            <h2>create new</h2>
+            {blogForm()}
+          </Togglable>
+          {blogsRows()}
         </div>
       }
     </div>
   )
 }
 
-export default App 
+export default App
