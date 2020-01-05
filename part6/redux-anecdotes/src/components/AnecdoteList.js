@@ -1,26 +1,21 @@
 import React from 'react'
+import { connect } from 'react-redux'
 import { voteFor } from '../reducers/anecdoteReducer'
 import { createNotification, removeNotification } from '../reducers/notificationReducer'
 
-const AnecdoteList = ({store}) => {
-  const anecdotes = store.getState().anecdotes
-  const filter = store.getState().filter
-
-  const anecdotesToShow = (filter.length > 0)
-  ? anecdotes.filter(anecdotes => anecdotes.content.toLowerCase().includes(filter.toLowerCase()))
-  : anecdotes
+const AnecdoteList = (props) => {
 
   const vote = (anecdote) => {
-    store.dispatch(voteFor(anecdote.id))
-    store.dispatch(createNotification(`you voted for '${anecdote.content}'`))
+    props.voteFor(anecdote.id)
+    props.createNotification(`you voted for '${anecdote.content}'`)
     setTimeout(() => {
-      store.dispatch(removeNotification())
+      props.removeNotification()
     }, 5000)
   }
 
   return (
     <div>
-      {anecdotesToShow.sort((a, b) => b.votes - a.votes).map(anecdote =>
+      {props.visibleAnecdotes.sort((a, b) => b.votes - a.votes).map(anecdote =>
         <div key={anecdote.id}>
           <div>
             {anecdote.content}
@@ -35,4 +30,29 @@ const AnecdoteList = ({store}) => {
   )
 }
 
-export default AnecdoteList
+const anecdotesToShow = ({ anecdotes, filter }) => {
+  if ( filter.length > 0 ) {
+    return anecdotes.filter(anecdotes => anecdotes.content.toLowerCase().includes(filter.toLowerCase()))
+  }
+
+  return anecdotes
+}
+
+
+const mapStateToProps = (state) => {
+  return {
+    visibleAnecdotes: anecdotesToShow(state)
+  }
+}
+
+const mapDispatchToProps = {
+  voteFor,
+  createNotification, 
+  removeNotification
+}
+
+// we can export directly the component returned by connect
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(AnecdoteList)
