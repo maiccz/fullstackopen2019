@@ -1,16 +1,13 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { voteFor } from '../reducers/anecdoteReducer'
-import { createNotification, removeNotification } from '../reducers/notificationReducer'
+import { setNotification } from '../reducers/notificationReducer'
 
 const AnecdoteList = (props) => {
 
-  const vote = (anecdote) => {
-    props.voteFor(anecdote.id)
-    props.createNotification(`you voted for '${anecdote.content}'`)
-    setTimeout(() => {
-      props.removeNotification()
-    }, 5000)
+  const vote = async (anecdote) => {
+    props.voteFor(anecdote)
+    props.setNotification(`you voted '${anecdote.content}'`, 10)
   }
 
   return (
@@ -47,8 +44,7 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = {
   voteFor,
-  createNotification, 
-  removeNotification
+  setNotification
 }
 
 // we can export directly the component returned by connect

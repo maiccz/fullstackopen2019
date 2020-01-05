@@ -9,16 +9,19 @@ const notificationReducer = (state = null, action) => {
   }
 }
 
-export const createNotification = message => {
-  return {
-    type: 'NEW_MESSAGE',
-    message
-  }
-}
+//props.setNotification(`you voted '${anecdote.content}'`, 10z)
 
-export const removeNotification = () => {
-  return {
-    type: 'HIDE_NOTIFICATION'
+export const setNotification = (message, time) => {
+  return async dispatch => {
+    dispatch({
+      type: 'NEW_MESSAGE',
+      message
+    })
+    setTimeout(() => {
+      dispatch({
+          type: 'HIDE_NOTIFICATION'
+        })
+    }, time * 1000)
   }
 }
 
